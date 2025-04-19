@@ -1,0 +1,159 @@
+.app {
+    font-family: sans-serif;
+    padding: 1rem;
+    max-width: 400px;
+    margin: auto;
+  }
+  
+  h1 {
+    text-align: center;
+  }
+  
+  .tabs-and-schedule {
+    display: inline-block;
+  }
+  
+  
+  .tabs {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1rem;
+    flex-wrap: nowrap; 
+    overflow-x: auto;   
+    scrollbar-width: none; 
+    -ms-overflow-style: none; 
+  }
+  
+  .tabs::-webkit-scrollbar {
+    display: none; 
+  }
+  
+  .tabs button {
+    flex: 1 0 auto;
+    padding: 0.3rem 0.6rem;
+    font-size: 35px !important;
+    border: none;
+    background: #eee;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 0 2px;
+  }
+  
+  .tabs button.active {
+    background: #333;
+    color: white;
+  }
+  
+  .schedule {
+    margin-top: 1rem;
+  }
+  
+  .schedule .event {
+    background: #f9f9f9;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    padding: 10px;
+    display: flex;
+    flex-direction: row; 
+    gap: 10px;
+    align-items: flex-start;
+  }
+  
+  .schedule .time {
+    font-weight: bold;
+    width: 60px;
+    flex-shrink: 0;
+    text-align: left;
+  }
+  
+  .schedule .details {
+    flex: 1;
+  }
+  
+  
+  .chat-button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: transparent;
+    border: none;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    z-index: 1000;
+    overflow: hidden;
+    padding: 0;
+  }
+  
+  .chat-button img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    display: block;
+  }
+  
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+  }
+  
+  .logout-button {
+    padding: 8px 16px;
+    background-color: #ff4444;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .logout-button:hover {
+    background-color: #cc0000;
+  }
+  
+  @media (max-width: 480px) {
+    .app {
+      padding: 0.5rem;
+    }
+  
+    h1 {
+      font-size: 1.5rem;
+    }
+  
+    .tabs button {
+      font-size: 20px !important;
+      padding: 0.2rem 0.4rem;
+      margin: 0 1px;
+    }
+  
+    .schedule .event {
+      flex-direction: row; 
+      padding: 8px;
+    }
+  
+    .schedule .time {
+      width: 60px;
+      text-align: left;
+      font-size: 0.9rem;
+    }
+  
+    .schedule .details {
+      font-size: 0.9rem;
+    }
+  
+    .chat-button {
+      width: 50px;
+      height: 50px;
+      bottom: 15px;
+      right: 15px;
+    }
+  
+    .chat-button img {
+      width: 100%;
+      height: 100%;
+    }
+  }

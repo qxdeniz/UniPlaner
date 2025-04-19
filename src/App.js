@@ -1,13 +1,7 @@
 import React, { useState, useEffect } from "react";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Link,
-  Navigate,
-  useLocation,
-  useNavigate,
-} from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from "react-router-dom";
+import Schedule from './home';
+import './forms.css';
 
 // Utility functions for cookies
 function setCookie(name, value, days) {
@@ -24,6 +18,26 @@ function getCookie(name) {
   }, "");
 }
 
+function removeCookie(name) {
+  setCookie(name, "", -1);
+}
+
+function Welcome() {
+  const navigate = useNavigate();
+
+  return (
+    <div className="auth-container">
+      <img src="/logo.svg" alt="УниПланер" className="logo" />
+      <h1 className="auth-title">УниПланер</h1>
+      <h2 className="auth-subtitle">Управляй своим расписанием</h2>
+      <div className="welcome-buttons">
+        <button onClick={() => navigate('/login')}>Войти</button>
+        <button onClick={() => navigate('/signup')}>Зарегистрироваться</button>
+      </div>
+    </div>
+  );
+}
+
 export default function App() {
   const [token, setToken] = useState("");
   
@@ -32,47 +46,23 @@ export default function App() {
     if (savedToken) setToken(savedToken);
   }, []);
 
+  const handleLogout = () => {
+    removeCookie("token");
+    setToken("");
+  };
+
   return (
     <Router>
-      <div className="app">
-        <nav>
-          <ul>
-            <li><Link to="/">Home</Link></li>
-            {!token && <li><Link to="/login">Login</Link></li>}
-            {!token && <li><Link to="/signup">Signup</Link></li>}
-            {token && <li><Link to="/dashboard">Dashboard</Link></li>}
-          </ul>
-        </nav>
-
-        <Routes>
-          <Route path="/" element={<Home token={token} />} />
-          <Route path="/login" element={<Login setToken={setToken} />} />
-          <Route path="/signup" element={<Signup setToken={setToken} />} />
-          <Route
-            path="/dashboard"
-            element={
-              <RequireAuth token={token}>
-                <Dashboard token={token} setToken={setToken} />
-              </RequireAuth>
-            }
-          />
-        </Routes>
-      </div>
+      <Routes>
+        <Route path="/" element={!token ? <Welcome /> : <Navigate to="/home" />} />
+        <Route path="/login" element={!token ? <Login setToken={setToken} /> : <Navigate to="/home" />} />
+        <Route path="/signup" element={!token ? <Signup setToken={setToken} /> : <Navigate to="/home" />} />
+        <Route 
+          path="/home" 
+          element={token ? <Schedule token={token} onLogout={handleLogout} /> : <Navigate to="/" />} 
+        />
+      </Routes>
     </Router>
-  );
-}
-
-function Home({ token }) {
-  return (
-    <div>
-      <h2>Home</h2>
-      {token && (
-        <p>
-          Your token is: <code>{token}</code>
-        </p>
-      )}
-      {!token && <p>Please login or signup.</p>}
-    </div>
   );
 }
 
@@ -94,37 +84,45 @@ function Login({ setToken }) {
       const data = await res.json();
       setCookie("token", data.access_token, 7);
       setToken(data.access_token);
-      navigate("/dashboard", { replace: true });
+      navigate("/", { replace: true });
     } catch (err) {
       setError("Invalid email or password");
     }
   };
 
   return (
-    <div>
-      <h2>Login</h2>
+    <div className="auth-container">
+      <img src="/logo.svg" alt="УниПланер" className="logo" />
+      <div className="auth-toggle">
+        <button className="active">Вход</button>
+        <button onClick={() => navigate('/signup')}>Регистрация</button>
+      </div>
+      <h1 className="auth-title">войти в аккаунт</h1>
+      <h2 className="auth-subtitle">введи email и пароль для входа</h2>
       {error && <p style={{ color: "red" }}>{error}</p>}
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>Email:</label>
-          <input 
-            type="email" 
-            value={email} 
-            onChange={(e) => setEmail(e.target.value)} 
-            required 
-          />
-        </div>
-        <div>
-          <label>Password:</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </div>
-        <button type="submit">Login</button>
+      <form onSubmit={handleSubmit} className="auth-form">
+        <input 
+          type="email" 
+          value={email} 
+          onChange={(e) => setEmail(e.target.value)} 
+          required 
+          placeholder="Email"
+        />
+        <input
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          placeholder="Пароль"
+        />
+        <button type="submit">Продолжить</button>
       </form>
+      <button 
+        className="auth-link"
+        onClick={() => navigate('/signup')}
+      >
+        Ещё нет аккаунта? Зарегистрируйтесь
+      </button>
     </div>
   );
 }
@@ -160,100 +158,62 @@ function Signup({ setToken }) {
       const loginData = await loginRes.json();
       setCookie("token", loginData.access_token, 7);
       setToken(loginData.access_token);
-      navigate("/dashboard", { replace: true });
+      navigate("/", { replace: true });
     } catch (err) {
       setError(err.message || "Signup error, please try again");
     }
   };
 
   return (
-    <div>
-      <h2>Signup</h2>
+    <div className="auth-container">
+      <img src="/logo.svg" alt="УниПланер" className="logo" />
+      <div className="auth-toggle">
+        <button onClick={() => navigate('/login')}>Вход</button>
+        <button className="active">Регистрация</button>
+      </div>
+      <h1 className="auth-title">создать аккаунт</h1>
       {error && <p style={{ color: "red" }}>{error}</p>}
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>Phone:</label>
-          <input value={phone} onChange={(e) => setPhone(e.target.value)} required />
-        </div>
-        <div>
-          <label>Email:</label>
-          <input 
-            type="email" 
-            value={email} 
-            onChange={(e) => setEmail(e.target.value)} 
-            required 
-          />
-        </div>
-        <div>
-          <label>Name:</label>
-          <input value={name} onChange={(e) => setName(e.target.value)} required />
-        </div>
-        <div>
-          <label>Group:</label>
-          <input value={group} onChange={(e) => setGroup(e.target.value)} required />
-        </div>
-        <div>
-          <label>Password:</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </div>
-        <button type="submit">Signup</button>
+      <form onSubmit={handleSubmit} className="auth-form">
+        <input 
+          value={name} 
+          onChange={(e) => setName(e.target.value)} 
+          required 
+          placeholder="Имя"
+        />
+        <input 
+          value={group} 
+          onChange={(e) => setGroup(e.target.value)} 
+          required 
+          placeholder="Номер группы"
+        />
+        <input 
+          value={phone} 
+          onChange={(e) => setPhone(e.target.value)} 
+          required 
+          placeholder="Номер телефона"
+        />
+        <input 
+          type="email"
+          value={email} 
+          onChange={(e) => setEmail(e.target.value)} 
+          required 
+          placeholder="Email"
+        />
+        <input
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          placeholder="Пароль"
+        />
+        <button type="submit">Продолжить</button>
       </form>
+      <button 
+        className="auth-link"
+        onClick={() => navigate('/login')}
+      >
+        Уже есть аккаунт? Войдите
+      </button>
     </div>
   );
-}
-
-// Updated Dashboard component to fetch and display user info using the token
-function Dashboard({ token, setToken }) {
-  const [userInfo, setUserInfo] = useState(null);
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    async function fetchUserInfo() {
-      try {
-        const res = await fetch("http://0.0.0.0:8000/userinfo", {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        if (!res.ok) throw new Error("Failed to fetch user info");
-        const data = await res.json();
-        setUserInfo(data);
-      } catch (err) {
-        console.error(err);
-      }
-    }
-    if (token) fetchUserInfo();
-  }, [token]);
-
-  const handleLogout = () => {
-    setCookie("token", "", -1);
-    setToken("");
-    navigate("/");
-  };
-
-  return (
-    <div>
-      <h2>Dashboard</h2>
-      {userInfo ? (
-        <pre>{JSON.stringify(userInfo, null, 2)}</pre>
-      ) : (
-        <p>Loading user information...</p>
-      )}
-      <button onClick={handleLogout}>Logout</button>
-    </div>
-  );
-}
-
-function RequireAuth({ token, children }) {
-  let location = useLocation();
-  if (!token) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
-  }
-  return children;
 }

@@ -8,6 +8,8 @@ import datetime
 from passlib.context import CryptContext
 from fastapi.security import OAuth2PasswordBearer
 from fastapi.middleware.cors import CORSMiddleware
+from parser.chat import analyze_sheldule
+
 app = FastAPI()
 
 app.add_middleware(
@@ -59,6 +61,8 @@ class UserLogin(BaseModel):
     email: EmailStr
     password: str
 
+class ScheduleRequest(BaseModel):
+    prompt: str
 
 def get_db():
     db = SessionLocal()
@@ -141,6 +145,15 @@ def userinfo(current_user: User = Depends(get_current_user)):
         "name": current_user.name,     # new field output
         "group": current_user.group    # new field output
     }
+
+@app.post("/gpt")
+def analyze_schedule(request: ScheduleRequest, current_user: User = Depends(get_current_user)):
+    try:
+        result = analyze_sheldule(request.prompt)
+        return {"answer": result}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 
 @app.get("/test-connection")
 def test_connection(db: Session = Depends(get_db)):
