@@ -1,7 +1,7 @@
-import parser.parser_r as parser_r
+from parser.pars import *
 
 def load_shedule():
-    schedule = parser_r.create_weekly_schedule()
+    schedule = create_weekly_schedule()
     result = ""
     for day, classes in schedule.items():
         if classes:  

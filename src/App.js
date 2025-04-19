@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import Schedule from './home';
+import Chat from './chat';
 import './forms.css';
 
-// Utility functions for cookies
+
 function setCookie(name, value, days) {
   const expires = days
     ? "; expires=" + new Date(Date.now() + days * 864e5).toUTCString()
@@ -61,6 +62,7 @@ export default function App() {
           path="/home" 
           element={token ? <Schedule token={token} onLogout={handleLogout} /> : <Navigate to="/" />} 
         />
+        <Route path="/chat" element={token ? <Chat /> : <Navigate to="/" />} />
       </Routes>
     </Router>
   );

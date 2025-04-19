@@ -3,20 +3,19 @@ import json
 from parser.get_sheldule import load_shedule
 import parser.config as config
 import logging
+from google import genai
 
-# Configure logging
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-MODEL = "deepseek/deepseek-v3-base:free"
-API_KEY = config.LLM_KEY
+MODEL = "gemini-2.0-flash-001"
+API_KEY = 'AIzaSyCRxaB09p2wEDJPbwc69tEukfrsv0HT5YQ'
 
-def process_content(content):
-    return content.replace('<think>', '').replace('</think>', '')
+client = genai.Client(api_key=API_KEY)
 
-def analyze_sheldule(prompt):
+def analyze_sheldule(prompt, user_id):
     try:
-        logger.info("Starting schedule analysis")
         shedule = load_shedule()
         if not shedule:
             logger.error("Failed to load schedule")
@@ -24,11 +23,17 @@ def analyze_sheldule(prompt):
 
         data = {
             "model": MODEL,
-            "messages": [{"role": "user", "content": f"""Ты помощник в составлении расписания для студентов. Твоя задача найти идеальное место для меропрятия в расписании студента. 
-Для этого проанализируй расписание и выполни просьбу студента. Если тебя попросили найти время, то ты должен подсказать день и конкретное время для этого мероприятия
-Входные данные:
-Задача/Запрос студента: {prompt}
-Расписание студента: {shedule}"""}],
+            "messages": [
+                {
+                    "role": "system",
+                    "content": """Ты помощник в анализе расписания для студентов. Твоя задача помогать анализировать расписание 
+и отвечать на вопросы о нем. Отвечай подробно, предлагай разные варианты времени для проведения мероприятия. Твои ответы должны быть не слишком большими, но подробными. Разделяй пробелами!"""
+                },
+                {
+                    "role": "user",
+                    "content": f"Запрос студента: {prompt}. Расписание студента: {shedule}"
+                }
+            ],
             "stream": False
         }
         
@@ -37,51 +42,39 @@ def analyze_sheldule(prompt):
         if not answer:
             logger.error("Empty response from chat_stream")
             raise Exception("Empty response from AI")
-        return answer
+        
+        return answer.replace("*", "")
     except Exception as e:
         logger.error(f"Error in analyze_sheldule: {str(e)}")
         raise
 
 def chat_stream(prompt, data):
-    headers = {
-        "Authorization": f"Bearer {API_KEY}",
-        "Content-Type": "application/json"
-    }
-    
     try:
-        response = requests.post(
-            "https://openrouter.ai/api/v1/chat/completions",
-            headers=headers,
-            json=data
-        )
+        messages = data.get('messages', [])
         
-        logger.info(f"API Response status: {response.status_code}")
+    
+        conversation = []
+        for msg in messages:
+            content = msg.get('content', '')
+            if content:
+                conversation.append(content)
         
-        if response.status_code != 200:
-            logger.error(f"API Error: {response.status_code} - {response.text}")
-            raise Exception(f"API Error: {response.status_code}")
-
-        response_json = response.json()
-        logger.info(f"API Response: {response_json}")
+        full_prompt = "\n".join(conversation)
+    
+        response = client.models.generate_content(
+    model='gemini-2.0-flash-001', contents=full_prompt
+)
         
-        if not response_json.get("choices"):
-            logger.error("No choices in response")
-            raise Exception("Invalid API response format")
+        if not response or not response.text:
+            logger.error("Empty response from Gemini")
+            raise Exception("Empty response from AI")
             
-        content = response_json["choices"][0]["message"]["content"]
-        cleaned = process_content(content)
+        logger.info(f"Processed response: {response.text}")
+        return response.text
         
-        if not cleaned:
-            logger.error("Empty content after processing")
-            raise Exception("Empty response content")
-            
-        logger.info(f"Processed response: {cleaned}")
-        return cleaned
-        
-    except requests.exceptions.RequestException as e:
-        logger.error(f"Request error: {str(e)}")
-        raise
     except Exception as e:
         logger.error(f"Error processing response: {str(e)}")
         raise
+
+
 

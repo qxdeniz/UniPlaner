@@ -147,9 +147,9 @@ def userinfo(current_user: User = Depends(get_current_user)):
     }
 
 @app.post("/gpt")
-def analyze_schedule(request: ScheduleRequest, current_user: User = Depends(get_current_user)):
+def analyze_schedule(request: ScheduleRequest):
     try:
-        result = analyze_sheldule(request.prompt)
+        result = analyze_sheldule(request.prompt, 2)
         return {"answer": result}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
