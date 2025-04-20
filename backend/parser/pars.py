@@ -1,7 +1,9 @@
 from bs4 import BeautifulSoup
 import json
+import os
 
-html_file = "/Users/deniz_mlg/Desktop/Универ/frontend/backend/parser/file.html"
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+html_file = os.path.join(SCRIPT_DIR, "file.html")
 
 def load_schedule():
     try:

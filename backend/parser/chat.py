@@ -12,6 +12,8 @@ logger = logging.getLogger(__name__)
 MODEL = "gemini-2.0-flash-001"
 API_KEY = 'AIzaSyCRxaB09p2wEDJPbwc69tEukfrsv0HT5YQ'
 
+#API_KEY = 'AIzaSyBmfY6uDjeDmaCbjjuDpMhLJe6H8nMMGXA'
+
 client = genai.Client(api_key=API_KEY)
 
 def analyze_sheldule(prompt, user_id):

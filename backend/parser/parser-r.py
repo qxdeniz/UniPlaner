@@ -1,15 +1,22 @@
+import os
 from bs4 import BeautifulSoup
 import json
 
-html_file = "/Users/deniz_mlg/Desktop/Универ/frontend/backend/parser/file.html"
+
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+html_file = os.path.join(SCRIPT_DIR, "file.html")
 
 def load_schedule():
     try:
         with open(html_file, "r", encoding="windows-1251") as file:
             soup = BeautifulSoup(file, "html.parser")
+            print(f"Successfully loaded file from: {html_file}")
         return soup
     except FileNotFoundError:
-        print(f"Файл {html_file} не найден.")
+        print(f"Файл не найден по пути: {html_file}")
+        return None
+    except Exception as e:
+        print(f"Ошибка при чтении файла: {str(e)}")
         return None
 
 def load_json_schedule(json_data):
@@ -60,7 +67,7 @@ def find_classes_for_day(schedule_data, day):
     return answer
 
 def parse_class_info(class_info):
-    """Parse class information into title and location with room number"""
+
     parts = class_info.split(',', 1)
     
     title = parts[0].strip()

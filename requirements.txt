@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+google-genai
+sqlalchemy
+pydantic
+beautifulsoup4
+requests
+PyJWT
+passlib
+bcrypt
+mysql-connector-python

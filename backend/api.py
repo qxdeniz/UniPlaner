@@ -3,13 +3,13 @@ from pydantic import BaseModel, EmailStr
 from sqlalchemy import create_engine, Column, Integer, String, or_
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session
-import jwt as pyjwt  # Renamed import
+import jwt as pyjwt 
 import datetime
 from passlib.context import CryptContext
 from fastapi.security import OAuth2PasswordBearer
 from fastapi.middleware.cors import CORSMiddleware
 from parser.chat import analyze_sheldule
-import aiohttp  # Добавьте в начало файла
+import aiohttp  
 
 app = FastAPI()
 
@@ -22,7 +22,7 @@ app.add_middleware(
 )
 
 
-DATABASE_URL = "mysql+mysqlconnector://user:password@localhost/uniplaner"  
+DATABASE_URL = "mysql+mysqlconnector://user:password@db:3306/uniplaner"  
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
@@ -167,13 +167,10 @@ async def get_events():
     try:
         async with aiohttp.ClientSession() as session:
             async with session.get('https://media.kpfu.ru/anons') as response:
-                if response.status != 200:
-                    raise HTTPException(
-                        status_code=response.status,
-                        detail=f"KFU API returned status code {response.status}"
-                    )
                 return await response.text()
-    except aiohttp.ClientError as e:
-        raise HTTPException(status_code=500, detail=f"Failed to fetch events: {str(e)}")
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to fetch events")
+
+@app.get("/")
+async def root():
+    return {"message": "API is working"}
