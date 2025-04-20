@@ -215,6 +215,22 @@
     border: 1px solid #ddd;
     border-radius: 4px;
   }
+
+  .event-form button[type="submit"] {
+    width: 100%;
+    padding: 12px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    margin-top: 10px;
+  }
+
+  .event-form button[type="submit"]:hover {
+    background-color: #45a049;
+  }
   
   .close-button {
     position: absolute;
