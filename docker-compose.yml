@@ -1,6 +1,17 @@
 version: '3.8'
 
 services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=development
+      - REACT_APP_API_URL=http://localhost:3001
+    restart: unless-stopped
+
   backend:
     build:
       context: .
@@ -8,14 +19,13 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - ./backend:/code
-    working_dir: /code
+      - ./backend:/app
+    working_dir: /app
     environment:
-      - DATABASE_URL=mysql://user:password@db:3306/uniplaner
-      - PYTHONPATH=/code
-      - PYTHONUNBUFFERED=1
+      - DATABASE_URL=mysql://user:password@db/uniplaner
     depends_on:
       - db
+    restart: unless-stopped
 
   db:
     image: mysql:8.0
@@ -29,18 +39,6 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
-      - /var/run/mysqld:/var/run/mysqld
-
-  frontend:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    ports:
-      - "3001:3001"
-    environment:
-      - NODE_ENV=development
-      - PORT=3001
-      - REACT_APP_API_URL=http://localhost:3001
     restart: unless-stopped
 
 volumes:

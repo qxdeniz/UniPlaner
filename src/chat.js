@@ -8,7 +8,6 @@ function Chat() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const messagesEndRef = useRef(null);
-  const initialMessageSent = useRef(false);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -34,16 +33,17 @@ function Chat() {
     } catch (err) {
       setMessages(prev => [...prev, { from: 'bot', text: 'Ошибка при получении ответа' }]);
     }
-  }, [input]);
+  }, []); // Убираем input из зависимостей
 
   useEffect(() => {
-    if (location.state?.initialMessage && !initialMessageSent.current) {
-      initialMessageSent.current = true;
+    if (location.state?.initialMessage) {
       const message = location.state.initialMessage;
       setInput(message);
-      sendMessage(message);
+      setTimeout(() => {
+        sendMessage(message);
+      }, 0);
     }
-  }, [sendMessage]);
+  }, []); // Эффект выполнится только при монтировании
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });

@@ -22,7 +22,7 @@ app.add_middleware(
 )
 
 
-DATABASE_URL = "mysql+mysqlconnector://user:password@db:3306/uniplaner"  
+DATABASE_URL = "mysql+mysqlconnector://user:password@db:3306/uniplaner" 
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
