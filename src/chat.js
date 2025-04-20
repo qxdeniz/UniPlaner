@@ -1,33 +1,28 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { FiSend, FiArrowLeft } from 'react-icons/fi';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import './ChatStyles.css';
 
 function Chat() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const messagesEndRef = useRef(null);
+  const initialMessageSent = useRef(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
+  const sendMessage = useCallback(async (messageText = null) => {
+    const textToSend = messageText || input;
+    if (!textToSend.trim()) return;
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
-
-  const sendMessage = async () => {
-    if (!input.trim()) return;
-
-    const userMessage = { from: 'user', text: input };
+    const userMessage = { from: 'user', text: textToSend };
     setMessages(prev => [...prev, userMessage]);
     setInput("");
 
     try {
       const res = await axios.post('http://localhost:8000/gpt', {
-        prompt: input
+        prompt: textToSend
       }, {
         headers: {
           "Content-Type": "application/json"
@@ -39,7 +34,24 @@ function Chat() {
     } catch (err) {
       setMessages(prev => [...prev, { from: 'bot', text: 'Ошибка при получении ответа' }]);
     }
+  }, [input]);
+
+  useEffect(() => {
+    if (location.state?.initialMessage && !initialMessageSent.current) {
+      initialMessageSent.current = true;
+      const message = location.state.initialMessage;
+      setInput(message);
+      sendMessage(message);
+    }
+  }, [sendMessage]);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   const handleBack = () => {
     navigate(-1);

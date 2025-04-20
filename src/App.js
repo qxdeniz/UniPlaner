@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import Schedule from './home';
+import News from './news';
 import Chat from './chat';
 import './forms.css';
-
+import logo from './logo.svg';
 
 function setCookie(name, value, days) {
   const expires = days
@@ -28,7 +29,7 @@ function Welcome() {
 
   return (
     <div className="auth-container">
-      <img src="/logo.svg" alt="УниПланер" className="logo" />
+      <img src={logo} alt="УниПланер" className="logo" />
       <h1 className="auth-title">УниПланер</h1>
       <h2 className="auth-subtitle">Управляй своим расписанием</h2>
       <div className="welcome-buttons">
@@ -62,7 +63,8 @@ export default function App() {
           path="/home" 
           element={token ? <Schedule token={token} onLogout={handleLogout} /> : <Navigate to="/" />} 
         />
-        <Route path="/chat" element={token ? <Chat /> : <Navigate to="/" />} />
+        <Route path="/news" element={<News />} />
+        <Route path="/chat" element={<Chat />} />
       </Routes>
     </Router>
   );
@@ -94,12 +96,12 @@ function Login({ setToken }) {
 
   return (
     <div className="auth-container">
-      <img src="/logo.svg" alt="УниПланер" className="logo" />
+      <img src={logo} alt="УниПланер" className="logo" />
       <div className="auth-toggle">
         <button className="active">Вход</button>
         <button onClick={() => navigate('/signup')}>Регистрация</button>
       </div>
-      <h1 className="auth-title">войти в аккаунт</h1>
+      <h1 className="auth-title">Войти в аккаунт</h1>
       <h2 className="auth-subtitle">введи email и пароль для входа</h2>
       {error && <p style={{ color: "red" }}>{error}</p>}
       <form onSubmit={handleSubmit} className="auth-form">
@@ -119,12 +121,13 @@ function Login({ setToken }) {
         />
         <button type="submit">Продолжить</button>
       </form>
-      <button 
+      <span 
         className="auth-link"
         onClick={() => navigate('/signup')}
+        style={{ cursor: 'pointer' }}
       >
         Ещё нет аккаунта? Зарегистрируйтесь
-      </button>
+      </span>
     </div>
   );
 }
@@ -150,7 +153,7 @@ function Signup({ setToken }) {
         const errorData = await res.json();
         throw new Error(errorData.detail || "Signup failed");
       }
-      // After successful signup, log in automatically
+
       const loginRes = await fetch("http://0.0.0.0:8000/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -168,12 +171,12 @@ function Signup({ setToken }) {
 
   return (
     <div className="auth-container">
-      <img src="/logo.svg" alt="УниПланер" className="logo" />
+      <img src={logo} alt="УниПланер" className="logo" />
       <div className="auth-toggle">
         <button onClick={() => navigate('/login')}>Вход</button>
         <button className="active">Регистрация</button>
       </div>
-      <h1 className="auth-title">создать аккаунт</h1>
+      <h1 className="auth-title">Создать аккаунт</h1>
       {error && <p style={{ color: "red" }}>{error}</p>}
       <form onSubmit={handleSubmit} className="auth-form">
         <input 
@@ -206,16 +209,17 @@ function Signup({ setToken }) {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
-          placeholder="Пароль"
+          placeholder="Пароль"      
         />
         <button type="submit">Продолжить</button>
       </form>
-      <button 
+      <span 
         className="auth-link"
         onClick={() => navigate('/login')}
+        style={{ cursor: 'pointer' }}
       >
         Уже есть аккаунт? Войдите
-      </button>
+      </span>
     </div>
   );
 }

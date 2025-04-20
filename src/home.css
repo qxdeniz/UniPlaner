@@ -3,6 +3,7 @@
     padding: 1rem;
     max-width: 400px;
     margin: auto;
+    padding-bottom: 70px;
   }
   
   h1 {
@@ -73,7 +74,7 @@
   
   .chat-button {
     position: fixed;
-    bottom: 20px;
+    bottom: 80px;
     right: 20px;
     background: transparent;
     border: none;
@@ -102,6 +103,25 @@
     padding: 0 20px;
   }
   
+  .header-buttons {
+    display: flex;
+    gap: 10px;
+  }
+
+  .news-button {
+    padding: 8px 16px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    display: none;
+  }
+  
+  .news-button:hover {
+    background-color: #45a049;
+  }
+
   .logout-button {
     padding: 8px 16px;
     background-color: #ff4444;
@@ -148,13 +168,18 @@
     .chat-button {
       width: 50px;
       height: 50px;
-      bottom: 15px;
+      bottom: 75px;
       right: 15px;
     }
   
     .chat-button img {
       width: 100%;
       height: 100%;
+    }
+
+    .tab-button {
+      padding: 10px 15px;
+      font-size: 12px;
     }
   }
 
@@ -209,8 +234,38 @@
     border: none;
     border-radius: 4px;
     cursor: pointer;
+    display: none;
   }
   
   .add-event-button:hover {
+    background-color: #45a049;
+  }
+
+  .bottom-tab-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    display: flex;
+    justify-content: space-around;
+    padding: 10px;
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+    z-index: 900;
+  }
+  
+  .tab-button {
+    padding: 12px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    flex: 1;
+    margin: 0 5px;
+  }
+  
+  .tab-button:hover {
     background-color: #45a049;
   }

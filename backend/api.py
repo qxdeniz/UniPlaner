@@ -9,6 +9,7 @@ from passlib.context import CryptContext
 from fastapi.security import OAuth2PasswordBearer
 from fastapi.middleware.cors import CORSMiddleware
 from parser.chat import analyze_sheldule
+import aiohttp  # Добавьте в начало файла
 
 app = FastAPI()
 
@@ -160,3 +161,19 @@ def test_connection(db: Session = Depends(get_db)):
 
     user_count = db.query(User).count()
     return {"msg": "Connection successful", "users_count": user_count}
+
+@app.get("/events")
+async def get_events():
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.get('https://media.kpfu.ru/anons') as response:
+                if response.status != 200:
+                    raise HTTPException(
+                        status_code=response.status,
+                        detail=f"KFU API returned status code {response.status}"
+                    )
+                return await response.text()
+    except aiohttp.ClientError as e:
+        raise HTTPException(status_code=500, detail=f"Failed to fetch events: {str(e)}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}")

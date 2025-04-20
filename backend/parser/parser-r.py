@@ -72,14 +72,15 @@ def parse_class_info(class_info):
     numbers = re.findall(r'\d+', class_info)
     if numbers:
         room_number = numbers[0]
-        
+        # Remove room number from title if it exists there
         title = re.sub(r'\s+\d+\s*$', '', title)
     
+    # Combine room and location
     location = None
     if room_number:
         location = f"Ауд. {room_number}"
         if location_parts:
-
+            # Remove date range if present
             if ' с ' in location_parts:
                 location_parts = location_parts.split(' с ')[0].strip()
             location += f", {location_parts}"
@@ -102,18 +103,19 @@ def create_weekly_schedule():
         print("Таблица с расписанием не найдена.")
         return None
 
-    rows = table.find_all("tr")[1:]  
+    rows = table.find_all("tr")[1:]  # Skip header row
     
     for row in rows:
         cells = row.find_all("td")
         time_slot = cells[0].get_text(strip=True)
-        if not time_slot:  
+        if not time_slot:  # Skip empty rows
             continue
             
         time_parts = time_slot.split('-')
         timeStart = time_parts[0].strip()
         timeEnd = time_parts[1].strip() if len(time_parts) > 1 else None
 
+        # Process each day
         for day_index, day_key in enumerate(['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб']):
             try:
                 class_info = cells[day_index + 1].get_text(" ", strip=True)

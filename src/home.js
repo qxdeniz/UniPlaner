@@ -74,9 +74,6 @@ function Schedule({ token, onLogout }) {
         </div>
 
         <div className="schedule">
-          <button className="add-event-button" onClick={() => setShowForm(true)}>
-            Добавить мероприятие
-          </button>
           {(schedule[activeDay] || []).map((item, index) => (
             <div className="event" key={index}>
               <div className="time">
@@ -90,6 +87,15 @@ function Schedule({ token, onLogout }) {
             </div>
           ))}
         </div>
+      </div>
+
+      <div className="bottom-tab-bar">
+        <button onClick={() => setShowForm(true)} className="tab-button">
+          Добавить мероприятие
+        </button>
+        <button onClick={() => navigate('/news')} className="tab-button">
+          Мероприятия
+        </button>
       </div>
 
       {showForm && (
